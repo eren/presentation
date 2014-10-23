@@ -129,6 +129,232 @@
                         <li>Twitter: @erenturkay, Github: eren</li>
                     </ul>
                 </section>
+
+                <section>
+
+                    <section>
+                        <h2>APIs</h2>
+                        <ul>
+                            <li class="fragment">Application Programming Interface</li>
+                            <li class="fragment">Defines software components, input/output parameters, types, etc</li>
+                            <li class="fragment">Examples include POSIX API, Windows API, etc.</li>
+                            <li class="fragment">On web, we have different APIs inc. RESTful APIs</li>
+                            <li class="fragment">Let's you work on a code easily. (Hopefully if it has documentation :])</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Example: Github</h2>
+                        <pre>
+                            <code data-trim class="json">
+                                curl https://api.github.com/users/eren
+
+{
+    "login": "eren",
+    "id": 39010,
+    "avatar_url": "https://avatars.githubusercontent.com/u/39010?v=2",
+    "type": "User",
+    "site_admin": false,
+    "name": "Eren Türkay",
+    "company": null,
+    "blog": "http://qwzxcv.wordpress.com/",
+    "location": "Istanbul",
+    "email": "turkay.eren .~at~. gmail.com",
+}
+                            </code>
+                        </pre>
+                    </section>
+
+                </section>
+
+                <section>
+                    <section>
+                        <h1>REST APIs</h1>
+                        <h2>Why do we want to use it?</h2>
+                    </section>
+
+                    <section data-background="img/fractal.jpg">
+                        <h2 class="box">Because abstraction is the key</h2>
+
+                        <p>
+                            <small>Image source: <a href="https://www.flickr.com/photos/fabio_dsp/150592235">Fábio Pinheiro</a></small>
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>What does it try to solve?</h2>
+                        <p>Two main things.</p>
+                        <ul>
+                            <li class="fragment">Service abstraction. Put simply, data abstraction</li>
+                            <li class="fragment">Uniform interface</li>
+                        </ul>
+
+                        <p class="fragment topmargin">Thus, when ANY web service claims it's RESTful, you can easily apply your previous knowledge</p>
+                    </section>
+
+                    <section>
+                        <h2>How does it try to solve?</h2>
+                        <p>By:</p>
+                        <ul>
+                            <li class="fragment">Layering the architecture (components, connectors, data, etc)</li>
+                            <li class="fragment">Defining set of constraints</li>
+                        </ul>
+                        <p class="topmargin fragment">See. What we have talked so far is general. REST is not only used in Web, but it is the largest implementation of a system conforming to the REST architectural style.</p>
+
+                        <aside class="notes">Now, let's see how we can apply REST to Web</aside>
+                    </section>
+
+                </section>
+
+
+                <section>
+
+                    <section>
+                        <h2>What is actually REST?</h2>
+                        <p>Representational State Transfer</p>
+                        <ul>
+                            <li>Client-server</li>
+                            <li>Stateless</li>
+                            <li>Cacheable</li>
+                            <li>Layered system</li>
+                            <li>Uniform interface</li>
+                        </ul>
+                        <p class="topmargin fragment">When you conform to these constraints, congratulations, you have a RESTful API!</p>
+                    </section>
+
+                    <section>
+                        <h2>When applied to Web</h2>
+                        <p>We have everything we need. GET/POST/PUT/DELETE, URI, JSON/XML/...</p>
+                        <p>All we need to do is to represent our data using these technologies while being stateless, cachable, layered, and uniform*.</p>
+
+                        <p>
+                            <small>* Web is client-side anyway</small>
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>Example</h2>
+                        <img src="img/wiki-rest.png" alt=""/>
+
+                        <p class="topmargin">
+                            <small>Source: <a href="http://en.wikipedia.org/wiki/Representational_state_transfer#Architectural_properties">Wikipedia</a></small>
+                        </p>
+                    </section>
+
+                </section>
+
+                <section>
+                    <section data-background="img/flask.jpg">
+                        <h1>Introduction to Flask</h1>
+
+                        <p class="topmargin">
+                            <small>Image source: <a href="https://www.flickr.com/photos/peterthoeny/14674060782">Peter Thoeny</a></small>
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>What is Flask?</h2>
+                        <ul>
+                            <li>Python microframework</li>
+                            <li>Based on Werkzeug, Jinja 2, and a number of useful libraries</li>
+                            <li>Easy to use</li>
+                            <li>Extensible</li>
+                            <li>Doesn't include ORM, form validation, users, session, etc</li>
+                            <li>The choice is up to you!</li>
+                        </ul>
+                        <p class="topmargin">
+                            <small>The snippets in the slides are gathered from <a href="http://flask.pocoo.org/">Flask official website</a> unless otherwise specified</small>
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>Really minimal example</h2>
+                        <pre><code class="python">
+                            from flask import Flask
+                            app = Flask(__name__)
+
+                            @app.route('/')
+                            def hello_world():
+                                return 'Hello World!'
+
+
+                            if __name__ == '__main__':
+                            app.run()
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Simple Routing</h2>
+                        <pre><code class="python">
+                            from flask import Flask
+                            app = Flask(__name__)
+
+                            @app.route('/')
+                            def index():
+                            return 'Index page'
+
+                            @app.route('/hello')
+                            def hello():
+                                return 'Hello World'
+
+                            if __name__ == '__main__':
+                            app.run()
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Variable Rules</h2>
+                        <pre><code class="python">
+                            @app.route('/user/&lt;username&gt;')
+                            def show_user_profile(username):
+                                # show the user profile for that user
+                                return 'User %s' % username
+
+                            @app.route('/post/&lt;int:post_id&gt;')
+                            def show_post(post_id):
+                                # show the post with the given id, the id is an integer
+                                return 'Post %d' % post_id
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>HTTP Methods</h2>
+                        <p>Different functions (views) for different HTTP methods are easy to write. We do not write:</p>
+                        <pre><code class="python">
+                            if http.method == "GET":
+                                # get the resource
+                            elif http.method == "POST":
+                                # add new resource
+                            elif http.method == "DELETE":
+                                # delete the resurce
+                            elif http.method == "PUT":
+                                # update the resource
+                        </code></pre>
+                        <p class="fragment">This is <u>NOT</u> pythonic! It looks like a PHP code :P</p>
+                    </section>
+
+                    <section>
+                        <h2>HTTP Methods</h2>
+                        <pre><code class="python">
+                            @app.route('/users', methods=['GET'])
+                            def get_users():
+                                # get users here
+                                return jsonify({ .... })
+
+                            @app.route('/users/&lt;username&gt;', methods=['GET'])
+                            def get_user(username):
+                                # get user and return
+
+                            @app.route('/users/&lt;username&gt;', methods=['POST'])
+                            def update_user(username):
+                                # update the user
+
+                            @app.route('/users/&lt;username&gt;', methods=['DELETE'])
+                            def delete_user(username):
+                                # delete the user
+                        </code></pre>
+                    </section>
+                </section>
                 
 			</div>
 
