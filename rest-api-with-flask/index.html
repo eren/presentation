@@ -113,7 +113,6 @@
                                 <li class="fragment">Modular structure</li>
                             </ul>
                         </li>
-                        <li class="fragment">Deployment of your API</li>
 
                     </ul>
                 </section>
@@ -319,7 +318,8 @@
 
                     <section>
                         <h2>HTTP Methods</h2>
-                        <p>Different functions (views) for different HTTP methods are easy to write. We do not write:</p>
+                        <p>Different functions (views) for different HTTP methods are easy to write. We will need a lot of GET/POST/PUT/DELETE code.</p>
+                        <p>We do not write:</p>
                         <pre><code class="python">
                             if http.method == "GET":
                                 # get the resource
@@ -354,8 +354,194 @@
                                 # delete the user
                         </code></pre>
                     </section>
+
+                    <section>
+                        <h2>Configuration</h2>
+                        <p>Flask application can be configured using a file</p>
+                        <pre><code class="python">
+                            from flask import Flask
+                            app = Flask(__name__)
+
+                            try:
+                                app.config.from_envvar('YOURPROJECT_SETTINGS')
+                            except RuntimeError:
+                                app.logger.warning('Environment variable "YOURPROJECT_SETTINGS" is not set. Using default settings')
+
+                            # register your views here
+                            # do some logic
+                            # ...
+
+                            if __name__ == '__main__':
+                                app.run()
+                        </code></pre>
+
+                        <p class="fragment">Or using a python object.</p>
+                        <pre class="fragment"><code class="python">
+                            app.config.from_object('yourproject.settings')
+                        </code></pre>
+
+                        <p class="fragment">Visit <a href="http://flask.pocoo.org/docs/0.10/config/">configuration section</a> on Flask doc</p>
+                    </section>
+
+                    <section>
+                        <h2>Logging</h2>
+                        <p>There are default logging handlers. Easy to use</p>
+                        <pre><code class="python">
+                            app.logger.debug('A value for debugging')
+                            app.logger.warning('A warning occurred (%d apples)', 42)
+                            app.logger.error('An error occurred')
+                        </code></pre>
+
+                        <p>You can register log handlers of your choice. Maybe you want an e-mail whenever a log happens.</p>
+                    </section>
+
+                    <section>
+                        <h2>Decorator</h2>
+                        <ul>
+                            <li>Eliminates code duplication</li>
+                            <li>Makes code easy to read</li>
+                        </ul>
+
+                        <pre><code class="python">
+                            @profile_app.route('/&lt;string:username&gt;', methods=['PUT'])
+                            @flask_jsonschema.validate('yazar', 'update')
+                            @auth.login_required
+                            def edit_user(username):
+                                # edit user here
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>Database</h2>
+                        <p>No built-in database code. I prefer SQLAlchemy. Just grab Flask-SQLAlchemy and begin to use</p>
+                    </section>
                 </section>
-                
+
+                <section>
+                    <section data-background="img/structure.jpg">
+                        <h1 class="box">Flask Project Structure</h1>
+                        <h2 class="box">Let's begin building</h2>
+
+                        <p>
+                            <small>Image source: <a href="https://www.flickr.com/photos/herrolsen/7009460113">Herr Polsen</a></small>
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>Objectives</h2>
+                        <ul>
+                            <li>Present the data in a readable (let's choose JSON)</li>
+                            <li>Abstract your database</li>
+                            <li>Make the system modular</li>
+                            <li>Eliminate code duplication</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>To achieve the objectives</h2>
+                        <p>We need to:</p>
+                        <ul>
+                            <li class="fragment">Think about our architecture of service</li>
+                            <li class="fragment">Decide on which parts we can make modular</li>
+                            <li class="fragment">Look at available tools (Flask, Python), understand what can be done</li>
+                            <li class="fragment">Structure the URI</li>
+                        </ul>
+
+                        <p class="topmargin fragment">Luckily, we have Python and all the objectives can be met.</p>
+                    </section>
+
+                    <section>
+                        <h2>Architecture</h2>
+                        <ul>
+                            <li>Users, profiles, items to CRUD</li>
+                            <li>Access control</li>
+                        </ul>
+
+                        <p class="fragment">The items to CRUD (Create, Replace, Update, Delete) can be submodules, right?</p>
+                        <p class="fragment">We can put access control code to library dictionary as well</p>
+                    </section>
+
+                    <section>
+                        <h2>Blueprints</h2>
+                        <p>It makes flask modular</p>
+                        <ul>
+                            <li class="fragment">Register an application using blueprint</li>
+                            <li class="fragment">Define URL prefix for a blueprint</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Example</h2>
+                        <p>apps/user/views.py</p>
+                        <pre><code class="python">
+                            from flask import Blueprint, jsonify
+
+                            user_app = Blueprint('user_app', __name__)
+
+                            user_app.route('/', methods=['GET'])
+                            def list_users():
+                                user_data = {}
+                                # user list logic
+
+                                return jsonify(user_data)
+                        </code></pre>
+
+                        <p>apps/__init__.py</p>
+                        <pre><code class="python">
+                            from flask import Flask
+
+                            from .apps.user.views import user_app
+                            from .apps.todos.views import todo_app
+
+                            app = Flask(__name__)
+                            app.register_blueprint(user_app, url_prefix='/users')
+                            app.register_blueprint(todo_app, url_prefix='/todos')
+                        </code></pre>
+                    </section>
+
+
+                    <section>
+                        <h2>Structuring the project</h2>
+                        <p>Base address: https://api.example.com</p>
+                        <p>Users: /users/</p>
+                        <p>Login: /login/</p>
+                        <p>Todo: /todos/</p>
+                    </section>
+
+                    <section>
+                        <h2>Project tree</h2>
+                        <pre><code>
+                            rest-api
+                            ├── INSTALL
+                            ├── README
+                            ├── api
+                            │   ├── __init__.py
+                            │   ├── apps
+                            │   │   ├── __init__.py
+                            │   │   ├── login
+                            │   │   │   ├── __init__.py
+                            │   │   │   └── views.py
+                            │   │   ├── todo
+                            │   │   │   ├── __init__.py
+                            │   │   │   ├── models.py
+                            │   │   │   └── views.py
+                            │   │   └── user
+                            │   │       ├── __init__.py
+                            │   │       ├── models.py
+                            │   │       └── views.py
+                            │   ├── default_settings.py
+                            │   ├── exceptions.py
+                            │   ├── handlers.py
+                            │   └── utils
+                            └── app.py
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <h1>Thank you!</h1>
+                    <h2>Questions?</h2>
+                </section>
+
 			</div>
 
 		</div>
